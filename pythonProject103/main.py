@@ -77,3 +77,12 @@ def delete_item(item_id: int):
 @app.get('/list-menu')
 def list_menu():
     return {'Menu': menu }
+
+@app.get('/list-offices')
+def list_offices():
+    offices_list = []
+    mycursor = connection.mydb.cursor()
+    mycursor.execute("select * from classicmodels.offices")
+    for offices in mycursor:
+        offices_list.append(offices)
+    return {'Offices': offices_list }
