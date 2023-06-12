@@ -81,8 +81,34 @@ def list_menu():
 @app.get('/list-offices')
 def list_offices():
     offices_list = []
-    mycursor = connection.mydb.cursor()
+    mycursor = connection.mydb.cursor(dictionary=True)
     mycursor.execute("select * from classicmodels.offices")
+    for offices in mycursor:
+        offices_list.append(offices)
+    return {'Offices': offices_list }
+
+@app.get('/get-office/{office_id}')
+def get_office(
+    office_id: int = fastapi.Path(...,
+        description="Fill with ID of the item you want to view")):
+    offices_list = []
+    mycursor = connection.mydb.cursor(dictionary=True)
+    sql_get_office_id = "select * from classicmodels.offices where officeCode = " + str(int(office_id)) + ""
+    mycursor.execute(sql_get_office_id)
+    for offices in mycursor:
+        offices_list.append(offices)
+    return {'Offices': offices_list }
+
+@app.get('/get-office-by-city-name/{city_name}')
+def get_office_by_city_name(
+    city_name: str = fastapi.Path(...,
+        description="Fill with ID of the item you want to view")):
+    if len(city_name) <= 3:
+        return {'Office name': 'Preencher mais de tres caracteres'}
+    offices_list = []
+    mycursor = connection.mydb.cursor(dictionary=True)
+    sql_get_office_id = "select * from classicmodels.offices where city like '" + city_name + "%'"
+    mycursor.execute(sql_get_office_id)
     for offices in mycursor:
         offices_list.append(offices)
     return {'Offices': offices_list }
