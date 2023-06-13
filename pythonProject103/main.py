@@ -1,6 +1,7 @@
 """from fastapi import FastAPI, Path"""
 import fastapi
 import connection
+
 #print(connection.mydb)
 #print("connection.mydb")
 app = fastapi.FastAPI()
@@ -112,3 +113,33 @@ def get_office_by_city_name(
     for offices in mycursor:
         offices_list.append(offices)
     return {'Offices': offices_list }
+
+@app.post('/office/{city}/{phone}/{addressLine1}/{addressLine2}/{state}/{country}/{postalCode}/{territory}')
+def create_item( city: str, phone: str, addressLine1: str, addressLine2: str, state: str, country: str, postalCode: str,  territory: str ):
+
+    if len(city) <= 3:
+        return {'Office name': 'Preencher o nome da cidade com mais de tres caracteres'}
+    mycursor = connection.mydb.cursor(dictionary=True)
+    sql_get = "SELECT max(officeCode) as maxofficeCode  from classicmodels.offices "
+    mycursor.execute(sql_get)
+    officeCode = 0
+    for offices in mycursor:
+        officeCode = int(offices['maxofficeCode']) + 1
+    #print(officeCode)
+    officeCode = str(officeCode)
+
+    sql_insert = """ INSERT INTO offices (officeCode,city,phone,addressLine1,addressLine2,state,country,postalCode,territory)  VALUES   ('%s', '%s','%s','%s','%s','%s','%s','%s','%s') ; COMMIT;""" % ( officeCode,  city, phone, addressLine1, addressLine2, state, country, postalCode,  territory )
+    print(sql_insert)
+    mycursor2 = connection.mydb.cursor()
+    mycursor2.execute(sql_insert)
+    #return {'Offices': "Inserido" }
+
+    """search = list(filter(lambda x: x["id"] == item_id, menu))
+    if search != []:
+        return {'Error': 'Item exists'}
+    item = {}
+    item['id'] = item_id
+    item['name'] = item_name
+    item['price'] = item_price
+    menu.append(item)
+    return item"""

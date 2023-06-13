@@ -4,5 +4,6 @@ mydb = mysql.connector.connect(
   user="root",
   password="",
   database="classicmodels"
+  multi='True',
 )
 #print(mydb)
