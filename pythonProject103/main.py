@@ -5,52 +5,13 @@ import connection
 #print(connection.mydb)
 #print("connection.mydb")
 app = fastapi.FastAPI()
-menu = [  {   'id': 1,        'name': 'coffee',        'price': 2.5     },
-        {        'id': 2,        'name': 'cake',        'price': 10    },
-        {        'id': 3,        'name': 'tea',        'price': 3.2    },
-        {        'id': 4,        'name': 'croissant',        'price': 5.79    }
-]
+
 
 @app.get("/")
 def hello_world_root():
     return {"Turma": "Backend"}
 
-@app.get('/get-item/{item_id}')
-def get_item(
-    item_id: int = fastapi.Path(...,
-        description="Fill with ID of the item you want to view")):
-    search = list(filter(lambda x: x["id"] == item_id, menu))
-    if search == []:
-        return {'Error': 'Item does not exist'}
-    return {'Item': search[0]}
-
-@app.get('/get-by-name/{item_name}')
-def get_by_name( item_name: str = fastapi.Path(...,  description="Preencha com o nome") ):
-    search = list(filter(lambda x: x["name"] == item_name, menu))
-    if search == []:
-        return {'item': 'Does not exist'}
-    return {'Item': search[0]}
-
-
-@app.get('/get-by-price/{item_price}')
-def get_by_price( item_price: float = fastapi.Path(...,  description="Preencha com o preco") ):
-    search = list(filter(lambda x: x["price"] == item_price, menu))
-    if search == []:
-        return {'item': 'Does not exist'}
-    return {'Item': search[0]}
-
-@app.post('/create-item/{item_id}/{item_name}/{item_price}')
-def create_item(item_id: int, item_name: str, item_price: float ):
-    search = list(filter(lambda x: x["id"] == item_id, menu))
-    if search != []:
-        return {'Error': 'Item exists'}
-    item = {}
-    item['id'] = item_id
-    item['name'] = item_name
-    item['price'] = item_price
-    menu.append(item)
-    return item
-
+"""
 @app.put('/update-item/{item_id}/{item_name}/{item_price}')
 def update_item(item_id: int, item_name: str, item_price: float ):
     search = list(filter(lambda x: x["id"] == item_id, menu))
@@ -63,21 +24,7 @@ def update_item(item_id: int, item_name: str, item_price: float ):
     if item_price is not None:
         search[0]['price'] = item_price
     return item
-
-@app.delete('/delete-item/{item-id}')
-def delete_item(item_id: int):
-    search = list(filter(lambda x: x["id"] == item_id, menu))
-    if search == []:
-        return {'Item': 'Does not exist'}
-    for i in range(len(menu)):
-        if menu[i]['id'] == item_id:
-            del menu[i]
-            break
-    return {'Message': 'Item deleted successfully'}
-
-@app.get('/list-menu')
-def list_menu():
-    return {'Menu': menu }
+"""
 
 @app.get('/list-offices')
 def list_offices():
@@ -119,7 +66,6 @@ def get_office_by_city_name(
 
 @app.post('/office/{city}/{phone}/{addressLine1}/{addressLine2}/{state}/{country}/{postalCode}/{territory}')
 def create_office( city: str, phone: str, addressLine1: str, addressLine2: str, state: str, country: str, postalCode: str,  territory: str ):
-
     if len(city) <= 3:
         return {'Office name': 'Preencher o nome da cidade com mais de tres caracteres'}
     mycursor = connection.mydb.cursor(dictionary=True)
@@ -128,7 +74,6 @@ def create_office( city: str, phone: str, addressLine1: str, addressLine2: str, 
     officeCode = 0
     for offices in mycursor:
         officeCode = int(offices['maxofficeCode']) + 1
-    #print(officeCode)
     mycursor.close()
     officeCode = str(officeCode)
 
@@ -139,3 +84,21 @@ def create_office( city: str, phone: str, addressLine1: str, addressLine2: str, 
     mycursor2.execute("COMMIT;")
     mycursor2.close()
     return {'Offices': "Inserido - "+str(officeCode) }
+
+@app.delete('/office/{officeCode}')
+def delete_office( officeCode: str ):
+    mycursor = connection.mydb.cursor(dictionary=True)
+    sql_get = "SELECT officeCode from classicmodels.offices where officeCode = "+officeCode+""
+    mycursor.execute(sql_get)
+    officeCode = ''
+    for offices in mycursor:
+        officeCode = offices['officeCode']
+    mycursor.close()
+    if officeCode == '':
+        return {'Message': 'Office Nao existe'}
+    else:
+        mycursor_del = connection.mydb.cursor(dictionary=True)
+        sql_del = "DELETE from classicmodels.offices where officeCode = "+officeCode+""
+        mycursor_del.execute(sql_del)
+        mycursor_del.close()
+        return {'Message': 'Office deleted successfully - '+str(officeCode)}
