@@ -119,7 +119,7 @@ def update_office( officeCode: str, city: str, phone: str, addressLine1: str, ad
         sql_update = """ UPDATE offices SET  city = '%s', phone = '%s' , addressLine1  = '%s',addressLine2  = '%s',state  = '%s' ,country  = '%s' , postalCode = '%s',
         territory = '%s' where officeCode = %s ; """ % (
         city, phone, addressLine1, addressLine2, state, country, postalCode, territory, officeCode)
-        print(sql_update)
+        #print(sql_update)
         mycursor2 = connection.mydb.cursor()
         mycursor2.execute(sql_update)
         mycursor2.execute("COMMIT;")
