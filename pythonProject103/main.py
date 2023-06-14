@@ -103,3 +103,25 @@ def delete_office( officeCode: str ):
         mycursor_del.execute("COMMIT;")
         mycursor_del.close()
         return {'Message': 'Office deleted successfully - '+str(officeCode)}
+
+@app.put('/office/{officeCode}/{city}/{phone}/{addressLine1}/{addressLine2}/{state}/{country}/{postalCode}/{territory}')
+def update_office( officeCode: str, city: str, phone: str, addressLine1: str, addressLine2: str, state: str, country: str, postalCode: str,  territory: str ):
+    mycursor = connection.mydb.cursor(dictionary=True)
+    sql_get = "SELECT officeCode from classicmodels.offices where officeCode = "+officeCode+""
+    mycursor.execute(sql_get)
+    officeCode = ''
+    for offices in mycursor:
+        officeCode = offices['officeCode']
+    mycursor.close()
+    if officeCode == '':
+        return {'Message': 'Office Nao existe'}
+    else:
+        sql_update = """ UPDATE offices SET  city = '%s', phone = '%s' , addressLine1  = '%s',addressLine2  = '%s',state  = '%s' ,country  = '%s' , postalCode = '%s',
+        territory = '%s' where officeCode = %s ; """ % (
+        city, phone, addressLine1, addressLine2, state, country, postalCode, territory, officeCode)
+        print(sql_update)
+        mycursor2 = connection.mydb.cursor()
+        mycursor2.execute(sql_update)
+        mycursor2.execute("COMMIT;")
+        mycursor2.close()
+        return {'Offices': "Atualizado - " + str(officeCode)}
