@@ -100,5 +100,6 @@ def delete_office( officeCode: str ):
         mycursor_del = connection.mydb.cursor(dictionary=True)
         sql_del = "DELETE from classicmodels.offices where officeCode = "+officeCode+""
         mycursor_del.execute(sql_del)
+        mycursor_del.execute("COMMIT;")
         mycursor_del.close()
         return {'Message': 'Office deleted successfully - '+str(officeCode)}
