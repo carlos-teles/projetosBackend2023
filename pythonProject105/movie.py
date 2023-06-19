@@ -10,6 +10,11 @@ def convert_and_write( jsonobj, filename ):
     file.write(html)
     file.close()
 
-response1 = requests.get("https://www.omdbapi.com/?apikey=XXXXXXXXXt=the%20terminator")
-#pprint.pprint(response1.json())
-convert_and_write( response1.json(), "the-terminator" )
+#response1 = requests.get("https://www.omdbapi.com/?apikey=XXXXX&t=the%20terminator")
+#convert_and_write( response1.json(), "the-terminator" )
+
+response1 = requests.get("https://www.omdbapi.com/?apikey=XXXXX&t=the%20matrix")
+convert_and_write( response1.json(), "the-matrix" )
+
+response2 = requests.get("https://www.omdbapi.com/?apikey=XXXXX&t=dune")
+convert_and_write( response2.json(), "dune" )
