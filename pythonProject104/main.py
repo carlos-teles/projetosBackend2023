@@ -48,42 +48,42 @@ def get_productlines_textdescription( textdescription: str):
 @app.post('/productlines/{productline}/{textdescription}/{htmldescription}/{image}')
 def create_productline( productline: str, textdescription: str, htmldescription: str, image: str):
     if len(productline) <= 3:
-        return {'Office name': 'Preencher o nome da cidade com mais de tres caracteres'}
+        return {'Productline name': '03 characteres or more'}
     mycursor = connection.mydb.cursor(dictionary=True)
-    sql_get = "SELECT max(CAST((substring(officeCode,1)) AS DECIMAL(5,2))) as maxofficeCode from classicmodels.offices "
+    sql_get = "SELECT productline from classicmodels.productlines where productline = '" + productline + "'"
     mycursor.execute(sql_get)
-    officeCode = 0
-    for offices in mycursor:
-        officeCode = int(offices['maxofficeCode']) + 1
+    productlines_str = ''
+    for productlines_cursor in mycursor:
+        productlines_str = productlines_cursor['productline']
     mycursor.close()
-    officeCode = str(officeCode)
+    productlines_str = str(productlines_str)
 
-    sql_insert = """ INSERT INTO offices (officeCode,city,phone,addressLine1,addressLine2,state,country,postalCode,territory)  VALUES   ('%s', '%s','%s','%s','%s','%s','%s','%s','%s') ; """ % ( officeCode,  city, phone, addressLine1, addressLine2, state, country, postalCode,  territory )
+    sql_insert = """ INSERT INTO classicmodels.productlines (productline,textdescription,htmldescription,image)  VALUES   ('%s', '%s','%s','%s') ; """ % ( productline,textdescription,htmldescription,image )
     #print(sql_insert)
     mycursor2 = connection.mydb.cursor()
     mycursor2.execute(sql_insert)
     mycursor2.execute("COMMIT;")
     mycursor2.close()
-    return {'Offices': "Inserido - "+str(officeCode) }
+    return {'Productline': "Inserted - "+str(productline) }
 
-@app.delete('/office/{officeCode}')
-def delete_office( officeCode: str ):
+@app.delete('/productlines/{productline}')
+def delete_productline( productline: str ):
     mycursor = connection.mydb.cursor(dictionary=True)
-    sql_get = "SELECT officeCode from classicmodels.offices where officeCode = "+officeCode+""
+    sql_get = "SELECT productline from classicmodels.productlines where productline = '"+productline+"'"
     mycursor.execute(sql_get)
-    officeCode = ''
-    for offices in mycursor:
-        officeCode = offices['officeCode']
+    productlines_str = ''
+    for productlines_cursor in mycursor:
+        productlines_str = productlines_cursor['productline']
     mycursor.close()
-    if officeCode == '':
-        return {'Message': 'Office Nao existe'}
+    if productlines_str == '':
+        return {'Message': 'productline Doesn´t exist'}
     else:
         mycursor_del = connection.mydb.cursor(dictionary=True)
-        sql_del = "DELETE from classicmodels.offices where officeCode = "+officeCode+""
+        sql_del = "DELETE from classicmodels.productlines where productline = '"+productline+"'"
         mycursor_del.execute(sql_del)
         mycursor_del.execute("COMMIT;")
         mycursor_del.close()
-        return {'Message': 'Office deleted successfully - '+str(officeCode)}
+        return {'Message': 'Productline deleted successfully - '+str(productlines_str)}
 
 @app.put('/office/{officeCode}/{city}/{phone}/{addressLine1}/{addressLine2}/{state}/{country}/{postalCode}/{territory}')
 def update_office( officeCode: str, city: str, phone: str, addressLine1: str, addressLine2: str, state: str, country: str, postalCode: str,  territory: str ):
